@@ -23,17 +23,17 @@ int mosfet1_mirror = 46; // HIGH signal = close circuit
 int mosfet2_tea = 44; // HIGH signal = close circuit
 int mosfet7_book = 38; // HIGH signal = close circuit
 int ssr1_light1 = 40; // LOW signal = close circuit
-int ssr2_light2 = 42 // LOW signal = close circuit
+int ssr2_light2 = 42; // LOW signal = close circuit
+int servo_pin = 10;
 
-Servo servo_ticket; //declare variable for servo
-servo_ticket.attach(10); //declare servo pin D10
+Servo servo; //declare variable for servo
 
 int stepper_curtains_en = 3; // HIGH signal = motor is off
 int stepper_curtains_stp = 4; 
 int stepper_curtains_dir = 5;
 
 int pleer1_busy = 15; //LOW = play, HIGH = stop
-int pleer1_busy = 14;
+int pleer2_busy = 14;
 
 unsigned long RamkaTime1;
 unsigned long RamkaTime2;
@@ -62,7 +62,7 @@ bool flag6 = 0;
 bool flag7 = 0;
 bool flag8 = 0;
 
-const int delay_time = 8000;
+const int delay_time = 3000; //time to read answer
 
 void setup()
 {
@@ -85,9 +85,10 @@ void setup()
     pinMode(mosfet6_answerLED6, OUTPUT);
     pinMode(mosfet7_answerLED7, OUTPUT);
     pinMode(mosfet8_answerLED8, OUTPUT);
-    pinMode(stepper_curtains_en, OUTPUT)
+    pinMode(stepper_curtains_en, OUTPUT);
     pinMode(stepper_curtains_stp, OUTPUT);
 	pinMode(stepper_curtains_dir, OUTPUT);
+	servo.attach(servo_pin); //declare servo pin D10
 
     digitalWrite(mosfet1_answerLED1, HIGH);
   	digitalWrite(mosfet2_answerLED2, HIGH);
@@ -106,7 +107,7 @@ void setup()
 
 void loop()
 {
-
+	but1_rel();
 }
 
 void pleer1()
@@ -136,7 +137,7 @@ void ticket()
 	for (int i = 0; i <= 180; i++)
 	{
 		servo.write(i); //stand servo for i degrees
-		delay(20); //wait time between steps
+		delay(5); //wait time between steps
 	}
 	delay(2000);
 	for (int i = 180; i > 0; i--)
@@ -146,24 +147,26 @@ void ticket()
 	}
 }
 
-void but_rel()
+void but1_rel() // 1Gramofon
 {
-	if (digitalRead(but2) == LOW && flag1 == 0 && flag2 == 0 && flag3 == 0 && flag4 == 0 && flag5 == 0 && flag6 == 0 && flag7 == 0 && flag8 == 0)
+	if (digitalRead(but1) == LOW && flag1 == 0 && flag2 == 0 && flag3 == 0 && flag4 == 0 && flag5 == 0 && flag6 == 0 && flag7 == 0 && flag8 == 0)
 	{
+		delay(50);
 		flag1 = 1;
+		Serial.println("Button_pushed, do something for a few seconds");
+		//ticket(); //and do something
 		ButtonTime1 = millis();
 	}
 
-	if ((millis() - ButtonTime1 > 8000) && flag1 == 1) // in "ButtonTime > xxxx", where "xxxx" - time of some action
+	if ((millis() - ButtonTime1 > 3000) && flag1 == 1) // in "ButtonTime > xxxx", where "xxxx" - time of some action
 	{
 		flag1 = 0;
-		digitalWrite(mosfet1_answerLED1, HIGH);
-		//and do something
+		digitalWrite(mosfet1_answerLED1, HIGH); //show the answer
+		Serial.println("Something done, light is on for some time to read an answer");
 		RamkaTime1 = millis();
-	}
+		delay(delay_time);
+		digitalWrite(mosfet1_answerLED1, LOW); //show the answer
+		Serial.println("Light is off");
 
-	else if (millis() - RamkaTime1 > delay_time) 
-	{
-		digitalWrite(mosfet1_answerLED1, LOW);
 	}
 }
