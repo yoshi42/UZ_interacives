@@ -1,7 +1,9 @@
-/*Interactive installation of Franz Jozeph's train coupe. Read the question, push the button, see some activity,
+/*Interactive installation of Franz Jozeph's train compartment. Read the question, push the button, see some activity,
 read an answer */
 
-//1 Grammofon
+/*All buttons are active. When you push one of them, all other become inactive */
+
+//1 Gramophone
 //2 Mirror
 //3 Ticket
 //4 Beep
@@ -12,6 +14,7 @@ read an answer */
 
 #include <Servo.h>
 #include <DFPlayer_Mini_Mp3.h>
+#include <FastLED.h>
 
 int but1 = 23;
 int but2 = 25;
@@ -38,9 +41,16 @@ int ssr1_light1 = 40; // LOW signal = close circuit
 int ssr2_light2 = 42; // LOW signal = close circuit
 int servo_pin = 6;
 
+int empty_pin1 = 50;
+int empty_pin2 = 52;
+int empty_pin3 = 53;
+int empty_pin4 = 51;
+
 Servo servo; //declare variable for servo
 
-int stepper_curtains_en = 3; // HIGH signal = motor is off
+int stepper_Gramophone_stp = 2;
+int stepper_Gramophone_dir = 3;
+
 int stepper_curtains_stp = 4; 
 int stepper_curtains_dir = 5;
 
@@ -74,6 +84,10 @@ bool flag6 = 0;
 bool flag7 = 0;
 bool flag8 = 0;
 
+#define NUM_LEDS 16 //number of leds in led strip
+#define led_data_pin 7 //
+CRGB leds[NUM_LEDS]; //define the array of leds
+
 const int delay_time = 3000; //time to read an answer
 
 void setup()
@@ -103,8 +117,14 @@ void setup()
     pinMode(mosfet7_book, OUTPUT);
     pinMode(ssr1_light1, OUTPUT);
     pinMode(ssr2_light2, OUTPUT);
+    pinMode(empty_pin1, OUTPUT);
+    pinMode(empty_pin2, OUTPUT);
+    pinMode(empty_pin3, OUTPUT);
+    pinMode(empty_pin4, OUTPUT);
 
-    pinMode(stepper_curtains_en, OUTPUT);
+    pinMode(stepper_Gramophone_stp, OUTPUT);
+	pinMode(stepper_Gramophone_dir, OUTPUT);
+
     pinMode(stepper_curtains_stp, OUTPUT);
 	pinMode(stepper_curtains_dir, OUTPUT);
 	servo.attach(servo_pin); //declare servo pin D10
@@ -117,17 +137,22 @@ void setup()
   	digitalWrite(mosfet6_answerLED6, LOW);
   	digitalWrite(mosfet7_answerLED7, LOW);
   	digitalWrite(mosfet8_answerLED8, LOW);
-  	digitalWrite(stepper_curtains_en, LOW);
 
   	digitalWrite(mosfet1_mirror, LOW);
   	digitalWrite(mosfet2_tea, LOW);
   	digitalWrite(mosfet7_book, LOW);
   	digitalWrite(ssr1_light1, HIGH);
   	digitalWrite(ssr2_light2, HIGH);
+  	digitalWrite(empty_pin1, LOW);
+  	digitalWrite(empty_pin2, LOW);
+  	digitalWrite(empty_pin3, LOW);
+  	digitalWrite(empty_pin4, LOW);
 
 	Serial.begin(9600);
 	Serial2.begin(9600);
 	Serial3.begin(9600);
+
+	FastLED.addLeds<WS2811, led_data_pin, RGB>(leds, NUM_LEDS);
 
 	servo.write(175); //stand servo for i degrees
 }
@@ -156,7 +181,29 @@ void ticket()
 		servo.write(175); //stand servo for i degrees
 }
 
-void curtain()
+void led_strip() 
+{
+	int del = 150; // delay
+	for (int i = 3; i > 0; i--)
+	{   // Move a single white led 
+	   for(int whiteLed = 0; whiteLed < NUM_LEDS; whiteLed = whiteLed + 1) 
+	   {
+	      // Turn our current led on to white, then show the leds
+	      leds[whiteLed] = CRGB::White;
+	      leds[whiteLed+1] = CRGB::White;
+	      // Show the leds (only one of which is set to color, from above)
+	      FastLED.show();
+	      // Wait a little bit
+	      delay(del);
+	      // Turn our current led back to black for the next loop around
+	      leds[whiteLed] = CRGB::Black;
+	      //leds[NUM_LEDS] = CRGB::Black;
+	      FastLED.show();
+	   }
+	}
+}
+
+void curtains_open()
 {
 	digitalWrite(stepper_curtains_dir, LOW);
     for(int a=0; a<2000; a++){
@@ -165,8 +212,10 @@ void curtain()
       digitalWrite(stepper_curtains_stp, LOW);
       delayMicroseconds(600);
     }
-    delay(3000);
+}
 
+void curtains_close()
+{
     digitalWrite(stepper_curtains_dir, HIGH);
     for(int a=0; a<2000; a++){
       digitalWrite(stepper_curtains_stp, HIGH);
@@ -176,18 +225,32 @@ void curtain()
     }
 }
 
-void but1_rel() // 1Gramofon
+void gramo()
+{
+	digitalWrite(stepper_Gramophone_dir, LOW);
+    for(int a=0; a<5000; a++){
+      digitalWrite(stepper_Gramophone_stp, HIGH);
+      delayMicroseconds(600);
+      digitalWrite(stepper_Gramophone_stp, LOW);
+      delayMicroseconds(600);
+    }
+    delay(3000);
+}
+
+void but1_rel() // 1Gramophone
 {
 	if (digitalRead(but1) == LOW && flag1 == 0 && flag2 == 0 && flag3 == 0 && flag4 == 0 && flag5 == 0 && flag6 == 0 && flag7 == 0 && flag8 == 0)
 	{
 		delay(50);
 		flag1 = 1;
-		Serial.println("Button1_pushed, run Gramofon");
+		Serial.println("Button1_pushed, run Gramophone");
 		
 		mp3_set_serial(Serial3);
 		delay(10);
 		mp3_set_volume (20);
-		mp3_play(1);  // play track "Gramofon"
+		mp3_play(1);  // play track "Gramophone"
+
+		gramo(); //twis vinyl
 
 		ButtonTime1 = millis();
 	}
@@ -196,7 +259,7 @@ void but1_rel() // 1Gramofon
 	{
 		flag1 = 0;
 		digitalWrite(mosfet1_answerLED1, HIGH); //show the answer
-		Serial.println("Gramofon done, light is on for delay_time to read an answer");
+		Serial.println("Gramophone done, light is on for delay_time to read an answer");
 		RamkaTime1 = millis();
 		delay(delay_time);
 		digitalWrite(mosfet1_answerLED1, LOW); //hide the answer
@@ -306,11 +369,13 @@ void but5_rel() // 5Curtain
 		flag5 = 1;
 		Serial.println("Button5_pushed, do something for a few seconds");
 
+		curtains_open();
 		mp3_set_serial(Serial2);
 		delay(10);
 		mp3_set_volume (20);
 		mp3_play(5);
-		curtain();
+		led_strip();
+		curtains_close();
 
 		ButtonTime5 = millis();
 	}
