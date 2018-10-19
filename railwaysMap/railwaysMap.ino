@@ -1,4 +1,4 @@
-/*Interactive installation of railways map of Ukraine. Read the question, push the button, see some activity*/
+/*Interactive installation of railways map of Ukraine. Read the question, push the button, see some activity, read an answer*/
 
 int but1 = 23;
 int but2 = 25;
