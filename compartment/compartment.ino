@@ -54,6 +54,12 @@ int stepper_Gramophone_dir = 3;
 int stepper_curtains_stp = 4; 
 int stepper_curtains_dir = 5;
 
+int stepper_book_dir = 29;
+int stepper_book_stp = 33;
+int stepper_book_ms = 37;
+
+int push_counter = 41;
+
 int pleer1_busy = 15; //LOW = play, HIGH = stop
 int pleer2_busy = 17;
 
@@ -127,6 +133,13 @@ void setup()
 
     pinMode(stepper_curtains_stp, OUTPUT);
 	pinMode(stepper_curtains_dir, OUTPUT);
+
+	pinMode(stepper_book_stp, OUTPUT);
+	pinMode(stepper_book_dir, OUTPUT);
+	pinMode(stepper_book_ms, OUTPUT);
+
+	pinMode(push_counter, OUTPUT);
+
 	servo.attach(servo_pin); //declare servo pin D10
 
     digitalWrite(mosfet1_answerLED1, LOW);
@@ -155,6 +168,8 @@ void setup()
 	FastLED.addLeds<WS2811, led_data_pin, RGB>(leds, NUM_LEDS);
 
 	servo.write(175); //stand servo for i degrees
+
+	light_on();
 }
 
 void loop()
@@ -183,7 +198,7 @@ void ticket()
 
 void led_strip() 
 {
-	int del = 150; // delay
+	int del = 120; // delay
 	for (int i = 3; i > 0; i--)
 	{   // Move a single white led 
 	   for(int whiteLed = 0; whiteLed < NUM_LEDS; whiteLed = whiteLed + 1) 
@@ -205,8 +220,8 @@ void led_strip()
 
 void curtains_open()
 {
-	digitalWrite(stepper_curtains_dir, LOW);
-    for(int a=0; a<2000; a++){
+	digitalWrite(stepper_curtains_dir, HIGH);
+    for(int a=0; a<1250; a++){
       digitalWrite(stepper_curtains_stp, HIGH);
       delayMicroseconds(600);
       digitalWrite(stepper_curtains_stp, LOW);
@@ -216,8 +231,8 @@ void curtains_open()
 
 void curtains_close()
 {
-    digitalWrite(stepper_curtains_dir, HIGH);
-    for(int a=0; a<2000; a++){
+    digitalWrite(stepper_curtains_dir, LOW);
+    for(int a=0; a<1250; a++){
       digitalWrite(stepper_curtains_stp, HIGH);
       delayMicroseconds(600);
       digitalWrite(stepper_curtains_stp, LOW);
@@ -225,16 +240,79 @@ void curtains_close()
     }
 }
 
+void book_open()
+{
+	digitalWrite(stepper_book_dir, LOW);
+    for(int a=0; a<2000; a++){
+      digitalWrite(stepper_book_stp, HIGH);
+      delayMicroseconds(600);
+      digitalWrite(stepper_book_stp, LOW);
+      delayMicroseconds(600);
+    }
+}
+
+void book_close()
+{
+    digitalWrite(stepper_book_dir, HIGH);
+    for(int a=0; a<2000; a++){
+      digitalWrite(stepper_book_stp, HIGH);
+      delayMicroseconds(600);
+      digitalWrite(stepper_book_stp, LOW);
+      delayMicroseconds(600);
+    }
+}
+
 void gramo()
 {
 	digitalWrite(stepper_Gramophone_dir, LOW);
-    for(int a=0; a<5000; a++){
+    for(long int a=0; a<35000; a++){
       digitalWrite(stepper_Gramophone_stp, HIGH);
-      delayMicroseconds(600);
+      delayMicroseconds(100);
       digitalWrite(stepper_Gramophone_stp, LOW);
-      delayMicroseconds(600);
+      delayMicroseconds(100);
     }
-    delay(3000);
+}
+
+void light_on()
+{
+	digitalWrite(ssr1_light1, LOW);
+	digitalWrite(ssr2_light2, LOW);
+	delay(50);
+	digitalWrite(ssr1_light1, HIGH);
+	digitalWrite(ssr2_light2, HIGH);
+	delay(80);
+	digitalWrite(ssr1_light1, LOW);
+	digitalWrite(ssr2_light2, LOW);
+	delay(100);
+	digitalWrite(ssr1_light1, HIGH);
+	digitalWrite(ssr2_light2, HIGH);
+	delay(150);
+	digitalWrite(ssr1_light1, LOW);
+	digitalWrite(ssr2_light2, LOW);
+}
+
+void light_on_quick()
+{
+	digitalWrite(ssr1_light1, LOW);
+	digitalWrite(ssr2_light2, LOW);
+	delay(22);
+	digitalWrite(ssr1_light1, HIGH);
+	digitalWrite(ssr2_light2, HIGH);
+	delay(22);
+	digitalWrite(ssr1_light1, LOW);
+	digitalWrite(ssr2_light2, LOW);
+	delay(22);
+	digitalWrite(ssr1_light1, HIGH);
+	digitalWrite(ssr2_light2, HIGH);
+	delay(22);
+	digitalWrite(ssr1_light1, LOW);
+	digitalWrite(ssr2_light2, LOW);
+}
+
+void light_off()
+{
+	digitalWrite(ssr1_light1, HIGH);
+	digitalWrite(ssr2_light2, HIGH);
 }
 
 void but1_rel() // 1Gramophone
@@ -247,9 +325,8 @@ void but1_rel() // 1Gramophone
 		
 		mp3_set_serial(Serial3);
 		delay(10);
-		mp3_set_volume (20);
+		mp3_set_volume (30);
 		mp3_play(1);  // play track "Gramophone"
-
 		gramo(); //twis vinyl
 
 		ButtonTime1 = millis();
@@ -281,9 +358,9 @@ void but2_rel() // 2Mirror
 		mp3_set_volume (20);
 		mp3_play(2);
 
-		digitalWrite(mosfet1_mirror, HIGH); //light_on the mirror
+		digitalWrite(mosfet1_mirror, HIGH); //light on the mirror
 		delay(5000);
-		digitalWrite(mosfet1_mirror, LOW); //light_off the mirror
+		digitalWrite(mosfet1_mirror, LOW); //light off the mirror
 
 		ButtonTime1 = millis();
 	}
@@ -361,7 +438,7 @@ void but4_rel() // 4Beep
 	}
 }
 
-void but5_rel() // 5Curtain
+void but5_rel() // 5Curtains
 {
 	if (digitalRead(but5) == LOW && flag1 == 0 && flag2 == 0 && flag3 == 0 && flag4 == 0 && flag5 == 0 && flag6 == 0 && flag7 == 0 && flag8 == 0)
 	{
@@ -369,12 +446,26 @@ void but5_rel() // 5Curtain
 		flag5 = 1;
 		Serial.println("Button5_pushed, do something for a few seconds");
 
-		curtains_open();
 		mp3_set_serial(Serial2);
 		delay(10);
-		mp3_set_volume (20);
-		mp3_play(5);
+		mp3_set_volume (30);
+		mp3_play(5); //curtains on
+		delay(200);
+		curtains_open();
+
+		mp3_set_serial(Serial2);
+		delay(10);
+		mp3_set_volume (15);
+		mp3_play(9); //kolesa
+		delay(200);
 		led_strip();
+
+		delay(200);
+		mp3_set_serial(Serial2);
+		delay(10);
+		mp3_set_volume (25);
+		mp3_play(10); //curtains off
+		delay(100);
 		curtains_close();
 
 		ButtonTime5 = millis();
@@ -434,14 +525,13 @@ void but7_rel() // 7Book
 		flag7 = 1;
 		Serial.println("Button7_pushed, do something for a few seconds");
 
+		book_open();
 		mp3_set_serial(Serial2);
 		delay(10);
 		mp3_set_volume (20);
 		mp3_play(7);
-
-		digitalWrite(mosfet7_book, HIGH);
-		delay(500);
-		digitalWrite(mosfet7_book, HIGH);
+		delay(2000);
+		book_close();
 
 		ButtonTime7 = millis();
 	}
@@ -449,7 +539,7 @@ void but7_rel() // 7Book
 	if ((millis() - ButtonTime7 > 2000) && flag7 == 1) // in "ButtonTime > xxxx", where "xxxx" - time of some action
 	{
 		flag7 = 0;
-		digitalWrite(mosfet6_answerLED6, HIGH); //show the answer
+		digitalWrite(mosfet7_answerLED7, HIGH); //show the answer
 		Serial.println("Something done, light is on for some time to read an answer");
 		RamkaTime7 = millis();
 		delay(delay_time);
@@ -471,12 +561,10 @@ void but8_rel() // 8Light
 		delay(10);
 		mp3_set_volume (20);
 		mp3_play(8);
-
-		digitalWrite(ssr1_light1, LOW);
-		digitalWrite(ssr2_light2, LOW);
+		delay(100);
+		light_on();
 		delay(5000);
-		digitalWrite(ssr1_light1, HIGH);
-		digitalWrite(ssr2_light2, HIGH);
+		light_off();
 
 		ButtonTime8 = millis();
 	}

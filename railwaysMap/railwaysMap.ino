@@ -23,6 +23,8 @@ int darlington8_buttonLED8 = 36; // HIGH signal = close circuit
 int darlington9_buttonLED9 = 38; // HIGH signal = close circuit
 int darlington10_buttonLED10 = 40; // HIGH signal = close circuit
 
+int push_counter = 42;//
+
 int mosfet1 = 19;
 int mosfet2 = 18;
 int mosfet3 = 17;
@@ -98,6 +100,8 @@ void setup()
     pinMode(darlington9_buttonLED9, OUTPUT);
     pinMode(darlington10_buttonLED10, OUTPUT);
 
+    pinMode(push_counter, OUTPUT);
+
     pinMode(mosfet1, OUTPUT);
     pinMode(mosfet2, OUTPUT);
     pinMode(mosfet3, OUTPUT);
@@ -126,6 +130,8 @@ void setup()
   	digitalWrite(darlington8_buttonLED8, HIGH);
   	digitalWrite(darlington9_buttonLED9, HIGH);
   	digitalWrite(darlington10_buttonLED10, HIGH);
+
+  	digitalWrite(push_counter, LOW);
 
   	digitalWrite(mosfet1, LOW);
   	digitalWrite(mosfet2, LOW);
@@ -174,6 +180,10 @@ void all_buttons_light_off()
   	digitalWrite(darlington8_buttonLED8, LOW);
   	digitalWrite(darlington9_buttonLED9, LOW);
   	digitalWrite(darlington10_buttonLED10, LOW);
+
+  	digitalWrite(push_counter, HIGH);
+  	delay(50);
+  	digitalWrite(push_counter, LOW);
 }
 
 void all_buttons_light_on()
