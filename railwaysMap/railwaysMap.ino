@@ -13,35 +13,35 @@ int but10 = 41;
 
 
 int darlington1_buttonLED1 = 22; // HIGH signal = close circuit
-int darlington2_buttonLED2 = 24; // HIGH signal = close circuit
-int darlington3_buttonLED3 = 26; // HIGH signal = close circuit
-int darlington4_buttonLED4 = 28; // HIGH signal = close circuit
-int darlington5_buttonLED5 = 30; // HIGH signal = close circuit
-int darlington6_buttonLED6 = 32; // HIGH signal = close circuit
-int darlington7_buttonLED7 = 34; // HIGH signal = close circuit
-int darlington8_buttonLED8 = 36; // HIGH signal = close circuit
-int darlington9_buttonLED9 = 38; // HIGH signal = close circuit
-int darlington10_buttonLED10 = 40; // HIGH signal = close circuit
+int darlington2_buttonLED2 = 24;
+int darlington3_buttonLED3 = 26;
+int darlington4_buttonLED4 = 28;
+int darlington5_buttonLED5 = 30;
+int darlington6_buttonLED6 = 32;
+int darlington7_buttonLED7 = 34;
+int darlington8_buttonLED8 = 36;
+int darlington9_buttonLED9 = 38;
+int darlington10_buttonLED10 = 40;
 
 int push_counter = 42;//
 
-int mosfet1 = 19;
-int mosfet2 = 18;
-int mosfet3 = 17;
-int mosfet4 = 16;
-int mosfet5 = 15;
-int mosfet6 = 14;
-int mosfet7 = 2;
-int mosfet8 = 3;
+int mosfet1 = 4;  // HIGH signal = close circuit
+int mosfet2 = 5; //dot
+int mosfet3 = 6; //__empty
+int mosfet4 = 7; //dot
+int mosfet5 = 8; //line
+int mosfet6 = 9; //line
+int mosfet7 = 10; //line
+int mosfet8 = 11; //dot
 
-int mosfet9 = 4;
-int mosfet10 = 5;
-int mosfet11 = 6;
-int mosfet12 = 7;
-int mosfet13 = 8;
-int mosfet14 = 9;
-int mosfet15 = 10;
-int mosfet16 = 11;
+int mosfet9 = 19; //dot
+int mosfet10 = 18; //___empty
+int mosfet11 = 17; //1,6,10
+int mosfet12 = 16; //3,6
+int mosfet13 = 15; //5,6
+int mosfet14 = 14; //10,6
+int mosfet15 = 2; //5,6,10
+int mosfet16 = 3; //1,5,6,10
 
 unsigned long RamkaTime1;
 unsigned long RamkaTime2;
@@ -75,6 +75,10 @@ bool flag7 = 0;
 bool flag8 = 0;
 bool flag9 = 0;
 bool flag10 = 0;
+
+
+int del = 5000; //still on line time
+int del_dot = 500; //blinking time
 
 void setup()
 {
@@ -152,6 +156,10 @@ void setup()
   	digitalWrite(mosfet16, LOW);
 
   	Serial.begin(9600);
+  	//all_map_on(); //for static work testing
+  	delay(3000);
+  	demo(); //for dynamic work testing
+  	//all_mosfets_test();
 }
 
 void loop()
@@ -200,6 +208,228 @@ void all_buttons_light_on()
   	digitalWrite(darlington10_buttonLED10, HIGH);
 }
 
+void all_map_off()
+{
+	digitalWrite(mosfet1, LOW);
+  	digitalWrite(mosfet2, LOW);
+  	digitalWrite(mosfet3, LOW);
+  	digitalWrite(mosfet4, LOW);
+  	digitalWrite(mosfet5, LOW);
+  	digitalWrite(mosfet6, LOW);
+  	digitalWrite(mosfet7, LOW);
+  	digitalWrite(mosfet8, LOW);
+
+  	digitalWrite(mosfet9, LOW);
+  	digitalWrite(mosfet10, LOW);
+  	digitalWrite(mosfet11, LOW);
+  	digitalWrite(mosfet12, LOW);
+  	digitalWrite(mosfet13, LOW);
+  	digitalWrite(mosfet14, LOW);
+  	digitalWrite(mosfet15, LOW);
+  	digitalWrite(mosfet16, LOW);
+}
+
+void all_map_on()
+{
+	digitalWrite(mosfet1, HIGH);
+  	digitalWrite(mosfet2, HIGH);
+  	digitalWrite(mosfet3, HIGH);
+  	digitalWrite(mosfet4, HIGH);
+  	digitalWrite(mosfet5, HIGH);
+  	digitalWrite(mosfet6, HIGH);
+  	digitalWrite(mosfet7, HIGH);
+  	digitalWrite(mosfet8, HIGH);
+
+  	digitalWrite(mosfet9, HIGH);
+  	digitalWrite(mosfet10, HIGH);
+  	digitalWrite(mosfet11, HIGH);
+  	digitalWrite(mosfet12, HIGH);
+  	digitalWrite(mosfet13, HIGH);
+  	digitalWrite(mosfet14, HIGH);
+  	digitalWrite(mosfet15, HIGH);
+  	digitalWrite(mosfet16, HIGH);
+}
+
+void all_mosfets_test()
+{
+	digitalWrite(mosfet1, HIGH);
+	delay(1000);
+  	digitalWrite(mosfet2, HIGH);
+  	delay(1000);
+  	digitalWrite(mosfet3, HIGH);
+  	delay(1000);
+  	digitalWrite(mosfet4, HIGH);
+  	delay(1000);
+  	digitalWrite(mosfet5, HIGH);
+  	delay(1000);
+  	digitalWrite(mosfet6, HIGH);
+  	delay(1000);
+  	digitalWrite(mosfet7, HIGH);
+  	delay(1000);
+  	digitalWrite(mosfet8, HIGH);
+  	delay(1000);
+  	digitalWrite(mosfet9, HIGH);
+  	delay(1000);
+  	digitalWrite(mosfet10, HIGH);
+  	delay(1000);
+  	digitalWrite(mosfet11, HIGH);
+  	delay(1000);
+  	digitalWrite(mosfet12, HIGH);
+  	delay(1000);
+  	digitalWrite(mosfet13, HIGH);
+  	delay(1000);
+  	digitalWrite(mosfet14, HIGH);
+  	delay(1000);
+  	digitalWrite(mosfet15, HIGH);
+  	delay(1000);
+  	digitalWrite(mosfet16, HIGH);
+}
+
+void demo()
+{
+	int save_del = del; //for saving previous value of variable
+	int save_del_dot = del_dot; //
+	del = 3000;
+	del_dot = 300;
+
+	answer1_on_off();
+	delay(2000);
+	answer2_on_off();
+	delay(2000);
+	answer3_on_off();
+	delay(2000);
+	answer4_on_off();
+	delay(2000);
+	answer5_on_off();
+	delay(2000);
+	answer6_on_off();
+	delay(2000);
+	answer7_on_off();
+	delay(2000);
+	answer8_on_off();
+	delay(2000);
+	answer9_on_off();
+	delay(2000);
+	answer10_on_off();
+
+	del = save_del; //restore value of "del" variable
+	del_dot = save_del_dot; //
+}
+
+void answer1_on_off()
+{
+	digitalWrite(mosfet1, HIGH);
+	digitalWrite(mosfet11, HIGH);
+	digitalWrite(mosfet16, HIGH);
+	delay(del);
+	digitalWrite(mosfet1, LOW);
+	digitalWrite(mosfet11, LOW);
+	digitalWrite(mosfet16, LOW);
+}
+
+void answer2_on_off()
+{
+	for(int i = 0; i < 4; i++)
+	{
+		digitalWrite(mosfet2, HIGH);
+		delay(del_dot);
+		digitalWrite(mosfet2, LOW);
+		delay(del_dot);
+	}
+}
+
+void answer3_on_off()
+{
+	digitalWrite(mosfet12, HIGH);
+	delay(del);
+	digitalWrite(mosfet12, LOW);
+}
+
+void answer4_on_off()
+{
+	for(int i = 0; i < 4; i++)
+	{
+		digitalWrite(mosfet4, HIGH);
+		delay(del_dot);
+		digitalWrite(mosfet4, LOW);
+		delay(del_dot);
+	}
+}
+
+void answer5_on_off()
+{
+	digitalWrite(mosfet5, HIGH);
+	digitalWrite(mosfet13, HIGH);
+	digitalWrite(mosfet15, HIGH);
+	digitalWrite(mosfet16, HIGH);
+	delay(del);
+	digitalWrite(mosfet5, LOW);
+	digitalWrite(mosfet13, LOW);
+	digitalWrite(mosfet15, LOW);
+	digitalWrite(mosfet16, LOW);
+}
+
+void answer6_on_off()
+{
+	digitalWrite(mosfet6, HIGH);
+	digitalWrite(mosfet11, HIGH);
+	digitalWrite(mosfet12, HIGH);
+	digitalWrite(mosfet13, HIGH);
+	digitalWrite(mosfet14, HIGH);
+	digitalWrite(mosfet15, HIGH);
+	digitalWrite(mosfet16, HIGH);
+	delay(del);
+	digitalWrite(mosfet6, LOW);
+	digitalWrite(mosfet11, LOW);
+	digitalWrite(mosfet12, LOW);
+	digitalWrite(mosfet13, LOW);
+	digitalWrite(mosfet14, LOW);
+	digitalWrite(mosfet15, LOW);
+	digitalWrite(mosfet16, LOW);
+}
+
+void answer7_on_off()
+{
+	digitalWrite(mosfet7, HIGH);
+	delay(del);
+	digitalWrite(mosfet7, LOW);
+}
+
+void answer8_on_off()
+{
+	for(int i = 0; i < 4; i++)
+	{
+		digitalWrite(mosfet8, HIGH);
+		delay(del_dot);
+		digitalWrite(mosfet8, LOW);
+		delay(del_dot);
+	}
+}
+
+void answer9_on_off()
+{
+	for(int i = 0; i < 4; i++)
+	{
+		digitalWrite(mosfet9, HIGH);
+		delay(del_dot);
+		digitalWrite(mosfet9, LOW);
+		delay(del_dot);
+	}
+}
+
+void answer10_on_off()
+{
+	digitalWrite(mosfet11, HIGH);
+	digitalWrite(mosfet14, HIGH);
+	digitalWrite(mosfet15, HIGH);
+	digitalWrite(mosfet16, HIGH);
+	delay(del);
+	digitalWrite(mosfet11, LOW);
+	digitalWrite(mosfet14, LOW);
+	digitalWrite(mosfet15, LOW);
+	digitalWrite(mosfet16, LOW);
+}
+
 void but1_rel() //
 {
 	if (digitalRead(but1) == LOW && flag1 == 0 && flag2 == 0 && flag3 == 0 && flag4 == 0 && flag5 == 0 && flag6 == 0 && flag7 == 0 && flag8 == 0)
@@ -210,17 +440,16 @@ void but1_rel() //
 		
 		all_buttons_light_off();
 		digitalWrite(darlington1_buttonLED1, HIGH);
-		delay(1000); //to lift eyes to the map
-		digitalWrite(mosfet1, HIGH);
+
+		answer1_on_off();
 
 		ButtonTime1 = millis();
 	}
 
-	if ((millis() - ButtonTime1 > 5000) && flag1 == 1) // in "ButtonTime > xxxx", where "xxxx" - time of some action
+	if ((millis() - ButtonTime1 > 10) && flag1 == 1) // in "ButtonTime > xxxx", where "xxxx" - time of some action
 	{
 		flag1 = 0;
 
-		digitalWrite(mosfet1, LOW);
 		Serial.println("something done, buttons light on, ready for new loop");
 		RamkaTime1 = millis();
 		all_buttons_light_on();
@@ -237,17 +466,15 @@ void but2_rel() //
 		
 		all_buttons_light_off();
 		digitalWrite(darlington2_buttonLED2, HIGH);
-		delay(1000); //to lift eyes to the map
-		digitalWrite(mosfet2, HIGH);
+		answer2_on_off();
 
 		ButtonTime2 = millis();
 	}
 
-	if ((millis() - ButtonTime2 > 5000) && flag2 == 1) // in "ButtonTime > xxxx", where "xxxx" - time of some action
+	if ((millis() - ButtonTime2 > 10) && flag2 == 1) // in "ButtonTime > xxxx", where "xxxx" - time of some action
 	{
 		flag2 = 0;
 
-		digitalWrite(mosfet2, LOW);
 		Serial.println("something done, buttons light on, ready for new loop");
 		RamkaTime2 = millis();
 		all_buttons_light_on();
@@ -264,17 +491,15 @@ void but3_rel() //
 		
 		all_buttons_light_off();
 		digitalWrite(darlington3_buttonLED3, HIGH);
-		delay(1000); //to lift eyes to the map
-		digitalWrite(mosfet3, HIGH);
+		answer3_on_off();
 
 		ButtonTime3 = millis();
 	}
 
-	if ((millis() - ButtonTime3 > 5000) && flag3 == 1) // in "ButtonTime > xxxx", where "xxxx" - time of some action
+	if ((millis() - ButtonTime3 > 10) && flag3 == 1) // in "ButtonTime > xxxx", where "xxxx" - time of some action
 	{
 		flag3 = 0;
 
-		digitalWrite(mosfet3, LOW);
 		Serial.println("something done, buttons light on, ready for new loop");
 		RamkaTime3 = millis();
 		all_buttons_light_on();
@@ -291,17 +516,15 @@ void but4_rel() //
 		
 		all_buttons_light_off();
 		digitalWrite(darlington4_buttonLED4, HIGH);
-		delay(1000); //to lift eyes to the map
-		digitalWrite(mosfet4, HIGH);
+		answer4_on_off();
 
 		ButtonTime4 = millis();
 	}
 
-	if ((millis() - ButtonTime4 > 5000) && flag4 == 1) // in "ButtonTime > xxxx", where "xxxx" - time of some action
+	if ((millis() - ButtonTime4 > 10) && flag4 == 1) // in "ButtonTime > xxxx", where "xxxx" - time of some action
 	{
 		flag4 = 0;
 
-		digitalWrite(mosfet4, LOW);
 		Serial.println("something done, buttons light on, ready for new loop");
 		RamkaTime4 = millis();
 		all_buttons_light_on();
@@ -318,17 +541,15 @@ void but5_rel() //
 		
 		all_buttons_light_off();
 		digitalWrite(darlington5_buttonLED5, HIGH);
-		delay(1000); //to lift eyes to the map
-		digitalWrite(mosfet5, HIGH);
+		answer5_on_off();
 
 		ButtonTime5 = millis();
 	}
 
-	if ((millis() - ButtonTime5 > 5000) && flag5 == 1) // in "ButtonTime > xxxx", where "xxxx" - time of some action
+	if ((millis() - ButtonTime5 > 10) && flag5 == 1) // in "ButtonTime > xxxx", where "xxxx" - time of some action
 	{
 		flag5 = 0;
 
-		digitalWrite(mosfet5, LOW);
 		Serial.println("something done, buttons light on, ready for new loop");
 		RamkaTime5 = millis();
 		all_buttons_light_on();
@@ -345,17 +566,15 @@ void but6_rel() //
 		
 		all_buttons_light_off();
 		digitalWrite(darlington6_buttonLED6, HIGH);
-		delay(1000); //to lift eyes to the map
-		digitalWrite(mosfet6, HIGH);
+		answer6_on_off();
 
 		ButtonTime6 = millis();
 	}
 
-	if ((millis() - ButtonTime6 > 5000) && flag6 == 1) // in "ButtonTime > xxxx", where "xxxx" - time of some action
+	if ((millis() - ButtonTime6 > 10) && flag6 == 1) // in "ButtonTime > xxxx", where "xxxx" - time of some action
 	{
 		flag6 = 0;
 
-		digitalWrite(mosfet6, LOW);
 		Serial.println("something done, buttons light on, ready for new loop");
 		RamkaTime6 = millis();
 		all_buttons_light_on();
@@ -372,17 +591,15 @@ void but7_rel() //
 		
 		all_buttons_light_off();
 		digitalWrite(darlington7_buttonLED7, HIGH);
-		delay(1000); //to lift eyes to the map
-		digitalWrite(mosfet7, HIGH);
+		answer7_on_off();
 
 		ButtonTime7 = millis();
 	}
 
-	if ((millis() - ButtonTime7 > 5000) && flag7 == 1) // in "ButtonTime > xxxx", where "xxxx" - time of some action
+	if ((millis() - ButtonTime7 > 10) && flag7 == 1) // in "ButtonTime > xxxx", where "xxxx" - time of some action
 	{
 		flag7 = 0;
 
-		digitalWrite(mosfet7, LOW);
 		Serial.println("something done, buttons light on, ready for new loop");
 		RamkaTime7 = millis();
 		all_buttons_light_on();
@@ -399,17 +616,15 @@ void but8_rel() //
 		
 		all_buttons_light_off();
 		digitalWrite(darlington8_buttonLED8, HIGH);
-		delay(1000); //to lift eyes to the map
-		digitalWrite(mosfet8, HIGH);
+		answer8_on_off();
 
 		ButtonTime8 = millis();
 	}
 
-	if ((millis() - ButtonTime8 > 5000) && flag8 == 1) // in "ButtonTime > xxxx", where "xxxx" - time of some action
+	if ((millis() - ButtonTime8 > 10) && flag8 == 1) // in "ButtonTime > xxxx", where "xxxx" - time of some action
 	{
 		flag8 = 0;
 
-		digitalWrite(mosfet8, LOW);
 		Serial.println("something done, buttons light on, ready for new loop");
 		RamkaTime8 = millis();
 		all_buttons_light_on();
@@ -426,17 +641,15 @@ void but9_rel() //
 		
 		all_buttons_light_off();
 		digitalWrite(darlington9_buttonLED9, HIGH);
-		delay(1000); //to lift eyes to the map
-		digitalWrite(mosfet9, HIGH);
+		answer9_on_off();
 
 		ButtonTime9 = millis();
 	}
 
-	if ((millis() - ButtonTime9 > 5000) && flag9 == 1) // in "ButtonTime > xxxx", where "xxxx" - time of some action
+	if ((millis() - ButtonTime9 > 10) && flag9 == 1) // in "ButtonTime > xxxx", where "xxxx" - time of some action
 	{
 		flag9 = 0;
 
-		digitalWrite(mosfet9, LOW);
 		Serial.println("something done, buttons light on, ready for new loop");
 		RamkaTime9 = millis();
 		all_buttons_light_on();
@@ -453,17 +666,15 @@ void but10_rel() //
 		
 		all_buttons_light_off();
 		digitalWrite(darlington10_buttonLED10, HIGH);
-		delay(1000); //to lift eyes to the map
-		digitalWrite(mosfet10, HIGH);
+		answer10_on_off();
 
 		ButtonTime10 = millis();
 	}
 
-	if ((millis() - ButtonTime10 > 5000) && flag10 == 1) // in "ButtonTime > xxxx", where "xxxx" - time of some action
+	if ((millis() - ButtonTime10 > 10) && flag10 == 1) // in "ButtonTime > xxxx", where "xxxx" - time of some action
 	{
 		flag10 = 0;
 
-		digitalWrite(mosfet10, LOW);
 		Serial.println("something done, buttons light on, ready for new loop");
 		RamkaTime10 = millis();
 		all_buttons_light_on();

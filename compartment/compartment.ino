@@ -36,15 +36,17 @@ int mosfet8_answerLED8 = 36; // HIGH signal = close circuit
 
 int mosfet1_mirror = 46; // HIGH signal = close circuit
 int mosfet2_tea = 44; // HIGH signal = close circuit
-int mosfet7_book = 38; // HIGH signal = close circuit
 int ssr1_light1 = 40; // LOW signal = close circuit
 int ssr2_light2 = 42; // LOW signal = close circuit
 int servo_pin = 6;
 
-int empty_pin1 = 50;
-int empty_pin2 = 52;
-int empty_pin3 = 53;
-int empty_pin4 = 51;
+int empty_pin3 = 50;
+int empty_pin4 = 52;
+int empty_pin5 = 53;
+int empty_pin6 = 51;
+int empty_pin7 = 38;
+int empty_pin8 = 45; //NOT CORRECT PIN
+
 
 Servo servo; //declare variable for servo
 
@@ -120,13 +122,14 @@ void setup()
 
     pinMode(mosfet1_mirror, OUTPUT);
     pinMode(mosfet2_tea, OUTPUT);
-    pinMode(mosfet7_book, OUTPUT);
     pinMode(ssr1_light1, OUTPUT);
     pinMode(ssr2_light2, OUTPUT);
-    pinMode(empty_pin1, OUTPUT);
-    pinMode(empty_pin2, OUTPUT);
     pinMode(empty_pin3, OUTPUT);
     pinMode(empty_pin4, OUTPUT);
+    pinMode(empty_pin5, OUTPUT);
+    pinMode(empty_pin6, OUTPUT);
+    pinMode(empty_pin7, OUTPUT);
+    pinMode(empty_pin8, OUTPUT);
 
     pinMode(stepper_Gramophone_stp, OUTPUT);
 	pinMode(stepper_Gramophone_dir, OUTPUT);
@@ -153,13 +156,18 @@ void setup()
 
   	digitalWrite(mosfet1_mirror, LOW);
   	digitalWrite(mosfet2_tea, LOW);
-  	digitalWrite(mosfet7_book, LOW);
   	digitalWrite(ssr1_light1, HIGH);
   	digitalWrite(ssr2_light2, HIGH);
-  	digitalWrite(empty_pin1, LOW);
-  	digitalWrite(empty_pin2, LOW);
   	digitalWrite(empty_pin3, LOW);
   	digitalWrite(empty_pin4, LOW);
+  	digitalWrite(empty_pin5, LOW);
+  	digitalWrite(empty_pin6, LOW);
+  	digitalWrite(empty_pin7, LOW);
+  	digitalWrite(empty_pin8, LOW);
+
+  	digitalWrite(push_counter, HIGH);
+
+
 
 	Serial.begin(9600);
 	Serial2.begin(9600);
@@ -167,7 +175,9 @@ void setup()
 
 	FastLED.addLeds<WS2811, led_data_pin, RGB>(leds, NUM_LEDS);
 
-	servo.write(175); //stand servo for i degrees
+	servo.write(160); //stand servo for i degrees
+
+	//ticket(); //just for test
 
 	light_on();
 }
@@ -186,14 +196,14 @@ void loop()
 
 void ticket()
 {
-	for (int i = 175; i >= 85; i--)
+	for (int i = 160; i >= 85; i--)
 	{
 		servo.write(i); //stand servo for i degrees
 		Serial.println(i);
 		delay(20);
 	}
 		delay(3000); //wait time
-		servo.write(175); //stand servo for i degrees
+		servo.write(160); //stand servo for i degrees
 }
 
 void led_strip() 
@@ -315,6 +325,13 @@ void light_off()
 	digitalWrite(ssr2_light2, HIGH);
 }
 
+void push_counter_plus1()
+{
+	digitalWrite(push_counter, LOW);
+	delay(50);
+	digitalWrite(push_counter, HIGH);
+}
+
 void but1_rel() // 1Gramophone
 {
 	if (digitalRead(but1) == LOW && flag1 == 0 && flag2 == 0 && flag3 == 0 && flag4 == 0 && flag5 == 0 && flag6 == 0 && flag7 == 0 && flag8 == 0)
@@ -323,12 +340,13 @@ void but1_rel() // 1Gramophone
 		flag1 = 1;
 		Serial.println("Button1_pushed, run Gramophone");
 		
-		mp3_set_serial(Serial3);
+		mp3_set_serial(Serial2);
 		delay(10);
 		mp3_set_volume (30);
 		mp3_play(1);  // play track "Gramophone"
-		gramo(); //twis vinyl
+		gramo(); //twist vinyl
 
+		push_counter_plus1();
 		ButtonTime1 = millis();
 	}
 
@@ -362,6 +380,7 @@ void but2_rel() // 2Mirror
 		delay(5000);
 		digitalWrite(mosfet1_mirror, LOW); //light off the mirror
 
+		push_counter_plus1();
 		ButtonTime1 = millis();
 	}
 
@@ -393,6 +412,7 @@ void but3_rel() // 3Ticket
 
 		ticket();
 
+		push_counter_plus1();
 		ButtonTime3 = millis();
 	}
 
@@ -422,6 +442,7 @@ void but4_rel() // 4Beep
 		mp3_set_volume (30);
 		mp3_play(4);
 
+		push_counter_plus1();
 		ButtonTime4 = millis();
 	}
 
@@ -468,6 +489,7 @@ void but5_rel() // 5Curtains
 		delay(100);
 		curtains_close();
 
+		push_counter_plus1();
 		ButtonTime5 = millis();
 	}
 
@@ -479,6 +501,7 @@ void but5_rel() // 5Curtains
 		RamkaTime5 = millis();
 		delay(delay_time);
 		digitalWrite(mosfet5_answerLED5, LOW); //hide the answer
+
 		Serial.println("Light5 is off");
 
 	}
@@ -494,13 +517,14 @@ void but6_rel() // 6Tea
 
 		mp3_set_serial(Serial2);
 		delay(10);
-		mp3_set_volume (20);
+		mp3_set_volume (30);
 		mp3_play(6);
 
 		digitalWrite(mosfet2_tea, HIGH);
 		delay(500);
 		digitalWrite(mosfet2_tea, LOW);
 
+		push_counter_plus1();
 		ButtonTime6 = millis();
 	}
 
@@ -533,6 +557,7 @@ void but7_rel() // 7Book
 		delay(2000);
 		book_close();
 
+		push_counter_plus1();
 		ButtonTime7 = millis();
 	}
 
@@ -566,6 +591,7 @@ void but8_rel() // 8Light
 		delay(5000);
 		light_off();
 
+		push_counter_plus1();
 		ButtonTime8 = millis();
 	}
 
