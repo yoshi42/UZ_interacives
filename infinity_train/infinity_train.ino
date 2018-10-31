@@ -28,17 +28,27 @@ void setup()
 }
 
 void loop()
-{	
-	del = ((analogRead(SENS)/5)+20);
-	//Serial.println((del));
-	go_go_go();
+{	if(analogRead(SENS) >= 550)
+	{
+		del = (1024-(analogRead(SENS))+50);
+		Serial.println(del);
+		go_go_go();
+		digitalWrite(dir, LOW);
+	}
+
+	if(analogRead(SENS) < 450)
+	{
+		del = ((analogRead(SENS))+50);
+		Serial.println(del);
+		go_go_go();
+		digitalWrite(dir, HIGH);
+	}
 }
 
 void go_go_go()
 {
 	for(int i = 0; i < 200; i++)
 	{
-		digitalWrite(dir, LOW);
 		digitalWrite(stp, HIGH);
 		delayMicroseconds(del);
 		digitalWrite(stp, LOW);

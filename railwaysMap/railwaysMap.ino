@@ -157,8 +157,11 @@ void setup()
 
   	Serial.begin(9600);
   	//all_map_on(); //for static work testing
-  	delay(3000);
-  	demo(); //for dynamic work testing
+	//all_buttons_light_on();
+  	//all_buttons_light_off();
+  	//dely(5000);
+  	//demo(); //for dynamic work testing
+ 	//all_map_on();
   	//all_mosfets_test();
 }
 
@@ -329,7 +332,7 @@ void answer1_on_off()
 
 void answer2_on_off()
 {
-	for(int i = 0; i < 4; i++)
+	for(int i = 0; i <= 3; i++)
 	{
 		digitalWrite(mosfet2, HIGH);
 		delay(del_dot);
@@ -347,7 +350,7 @@ void answer3_on_off()
 
 void answer4_on_off()
 {
-	for(int i = 0; i < 4; i++)
+	for(int i = 0; i <= 3; i++)
 	{
 		digitalWrite(mosfet4, HIGH);
 		delay(del_dot);
@@ -397,7 +400,7 @@ void answer7_on_off()
 
 void answer8_on_off()
 {
-	for(int i = 0; i < 4; i++)
+	for(int i = 0; i <= 5; i++)
 	{
 		digitalWrite(mosfet8, HIGH);
 		delay(del_dot);
@@ -408,7 +411,7 @@ void answer8_on_off()
 
 void answer9_on_off()
 {
-	for(int i = 0; i < 4; i++)
+	for(int i = 0; i <= 3; i++)
 	{
 		digitalWrite(mosfet9, HIGH);
 		delay(del_dot);

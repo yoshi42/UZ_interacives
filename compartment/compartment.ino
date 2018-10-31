@@ -16,39 +16,41 @@ read an answer */
 #include <DFPlayer_Mini_Mp3.h>
 #include <FastLED.h>
 
-int but1 = 23;
-int but2 = 25;
-int but3 = 27;
-int but4 = 31;
-int but5 = 35;
-int but6 = 39;
-int but7 = 43;
-int but8 = 47;
+int but1 = 23; //23
+int but2 = 25; //25
+int but3 = 27; //27
+int but4 = 31; //31
+int but5 = 35; //35
+int but6 = 39; //39
+int but7 = 43; //43
+int but8 = 47; //47
 
 int mosfet1_answerLED1 = 22; // HIGH signal = close circuit
 int mosfet2_answerLED2 = 24; // HIGH signal = close circuit
 int mosfet3_answerLED3 = 26; // HIGH signal = close circuit
+int mosfet6_answerLED6 = 32; // HIGH signal = close circuit
 int mosfet4_answerLED4 = 28; // HIGH signal = close circuit
 int mosfet5_answerLED5 = 30; // HIGH signal = close circuit
-int mosfet6_answerLED6 = 32; // HIGH signal = close circuit
 int mosfet7_answerLED7 = 34; // HIGH signal = close circuit
 int mosfet8_answerLED8 = 36; // HIGH signal = close circuit
 
 int mosfet1_mirror = 46; // HIGH signal = close circuit
 int mosfet2_tea = 44; // HIGH signal = close circuit
-int ssr1_light1 = 40; // LOW signal = close circuit
+int ssr1_light1 = 38; // LOW signal = close circuit
 int ssr2_light2 = 42; // LOW signal = close circuit
 int servo_pin = 6;
+int servo_pin2 = 40;
 
 int empty_pin3 = 50;
 int empty_pin4 = 52;
 int empty_pin5 = 53;
 int empty_pin6 = 51;
-int empty_pin7 = 38;
-int empty_pin8 = 45; //NOT CORRECT PIN
+//int empty_pin7 = ; //NOT CORRECT PIN
+//int empty_pin8 = ; //NOT CORRECT PIN
 
 
 Servo servo; //declare variable for servo
+Servo servo2; //declare variable for servo
 
 int stepper_Gramophone_stp = 2;
 int stepper_Gramophone_dir = 3;
@@ -128,8 +130,8 @@ void setup()
     pinMode(empty_pin4, OUTPUT);
     pinMode(empty_pin5, OUTPUT);
     pinMode(empty_pin6, OUTPUT);
-    pinMode(empty_pin7, OUTPUT);
-    pinMode(empty_pin8, OUTPUT);
+    //pinMode(empty_pin7, OUTPUT);
+    //pinMode(empty_pin8, OUTPUT);
 
     pinMode(stepper_Gramophone_stp, OUTPUT);
 	pinMode(stepper_Gramophone_dir, OUTPUT);
@@ -143,7 +145,8 @@ void setup()
 
 	pinMode(push_counter, OUTPUT);
 
-	servo.attach(servo_pin); //declare servo pin D10
+	servo.attach(servo_pin); //declare servo
+	servo2.attach(servo_pin2); //declare servo
 
     digitalWrite(mosfet1_answerLED1, LOW);
   	digitalWrite(mosfet2_answerLED2, LOW);
@@ -162,12 +165,12 @@ void setup()
   	digitalWrite(empty_pin4, LOW);
   	digitalWrite(empty_pin5, LOW);
   	digitalWrite(empty_pin6, LOW);
-  	digitalWrite(empty_pin7, LOW);
-  	digitalWrite(empty_pin8, LOW);
+  	//digitalWrite(empty_pin7, LOW);
+  	//igitalWrite(empty_pin8, LOW);
+
+  	light_up_blink();
 
   	digitalWrite(push_counter, HIGH);
-
-
 
 	Serial.begin(9600);
 	Serial2.begin(9600);
@@ -175,11 +178,9 @@ void setup()
 
 	FastLED.addLeds<WS2811, led_data_pin, RGB>(leds, NUM_LEDS);
 
-	servo.write(160); //stand servo for i degrees
-
-	//ticket(); //just for test
-
-	light_on();
+	servo.write(160); //stand servo for 160 degrees
+	servo2.write(160);
+	light_sides_on();
 }
 
 void loop()
@@ -199,11 +200,36 @@ void ticket()
 	for (int i = 160; i >= 85; i--)
 	{
 		servo.write(i); //stand servo for i degrees
-		Serial.println(i);
+		//Serial.println(i);
 		delay(20);
 	}
 		delay(3000); //wait time
 		servo.write(160); //stand servo for i degrees
+		mp3_set_volume(5);
+}
+
+void book_open_close()
+{
+	for (int i = 160; i >= 85; i--)
+	{
+		servo2.write(i); //stand servo for i degrees
+		Serial.println(i);
+		delay(40);
+	}
+		delay(4000); //wait time
+		servo2.write(160); //stand servo for i degrees
+}
+
+void book_open()
+{
+	for (int i = 20; i <= 140; i++)
+	{
+		servo2.write(i); //stand servo for i degrees
+		Serial.println(i);
+		delay(20);
+	}
+		delay(3000); //wait time
+		servo2.write(20); //stand servo for i degrees
 }
 
 void led_strip() 
@@ -250,28 +276,6 @@ void curtains_close()
     }
 }
 
-void book_open()
-{
-	digitalWrite(stepper_book_dir, LOW);
-    for(int a=0; a<2000; a++){
-      digitalWrite(stepper_book_stp, HIGH);
-      delayMicroseconds(600);
-      digitalWrite(stepper_book_stp, LOW);
-      delayMicroseconds(600);
-    }
-}
-
-void book_close()
-{
-    digitalWrite(stepper_book_dir, HIGH);
-    for(int a=0; a<2000; a++){
-      digitalWrite(stepper_book_stp, HIGH);
-      delayMicroseconds(600);
-      digitalWrite(stepper_book_stp, LOW);
-      delayMicroseconds(600);
-    }
-}
-
 void gramo()
 {
 	digitalWrite(stepper_Gramophone_dir, LOW);
@@ -283,46 +287,51 @@ void gramo()
     }
 }
 
-void light_on()
+void light_sides_on()
 {
 	digitalWrite(ssr1_light1, LOW);
-	digitalWrite(ssr2_light2, LOW);
 	delay(50);
 	digitalWrite(ssr1_light1, HIGH);
-	digitalWrite(ssr2_light2, HIGH);
 	delay(80);
 	digitalWrite(ssr1_light1, LOW);
-	digitalWrite(ssr2_light2, LOW);
 	delay(100);
 	digitalWrite(ssr1_light1, HIGH);
-	digitalWrite(ssr2_light2, HIGH);
 	delay(150);
 	digitalWrite(ssr1_light1, LOW);
-	digitalWrite(ssr2_light2, LOW);
 }
 
-void light_on_quick()
+void light_sides_off()
 {
-	digitalWrite(ssr1_light1, LOW);
-	digitalWrite(ssr2_light2, LOW);
-	delay(22);
 	digitalWrite(ssr1_light1, HIGH);
-	digitalWrite(ssr2_light2, HIGH);
-	delay(22);
-	digitalWrite(ssr1_light1, LOW);
-	digitalWrite(ssr2_light2, LOW);
-	delay(22);
-	digitalWrite(ssr1_light1, HIGH);
-	digitalWrite(ssr2_light2, HIGH);
-	delay(22);
-	digitalWrite(ssr1_light1, LOW);
-	digitalWrite(ssr2_light2, LOW);
 }
 
-void light_off()
+void light_up_blink()
 {
-	digitalWrite(ssr1_light1, HIGH);
+	digitalWrite(ssr2_light2, LOW);
+	delay(50);
 	digitalWrite(ssr2_light2, HIGH);
+	delay(40);
+	digitalWrite(ssr2_light2, LOW);
+	delay(50);
+	digitalWrite(ssr2_light2, HIGH);
+	delay(40);
+	digitalWrite(ssr2_light2, LOW);
+	delay(50);
+	digitalWrite(ssr2_light2, HIGH);
+	delay(40);
+	digitalWrite(ssr2_light2, LOW);
+	delay(50);
+	digitalWrite(ssr2_light2, HIGH);
+	delay(40);
+	digitalWrite(ssr2_light2, LOW);
+	delay(50);
+	digitalWrite(ssr2_light2, HIGH);
+	delay(40);
+	digitalWrite(ssr2_light2, LOW);
+	delay(50);
+	digitalWrite(ssr2_light2, HIGH);
+	delay(40);
+	digitalWrite(ssr2_light2, LOW);
 }
 
 void push_counter_plus1()
@@ -342,7 +351,7 @@ void but1_rel() // 1Gramophone
 		
 		mp3_set_serial(Serial2);
 		delay(10);
-		mp3_set_volume (30);
+		mp3_set_volume (20);
 		mp3_play(1);  // play track "Gramophone"
 		gramo(); //twist vinyl
 
@@ -350,7 +359,7 @@ void but1_rel() // 1Gramophone
 		ButtonTime1 = millis();
 	}
 
-	if ((millis() - ButtonTime1 > 2000) && flag1 == 1) // in "ButtonTime > xxxx", where "xxxx" - time of some action
+	if ((millis() - ButtonTime1 > 100) && flag1 == 1) // in "ButtonTime > xxxx", where "xxxx" - time of some action
 	{
 		flag1 = 0;
 		digitalWrite(mosfet1_answerLED1, HIGH); //show the answer
@@ -373,18 +382,20 @@ void but2_rel() // 2Mirror
 
 		mp3_set_serial(Serial2);
 		delay(10);
-		mp3_set_volume (20);
+		mp3_set_volume (25);
 		mp3_play(2);
 
+		digitalWrite(ssr1_light1, HIGH);
 		digitalWrite(mosfet1_mirror, HIGH); //light on the mirror
-		delay(5000);
+		delay(6000);
 		digitalWrite(mosfet1_mirror, LOW); //light off the mirror
+		digitalWrite(ssr1_light1, LOW);
 
 		push_counter_plus1();
 		ButtonTime1 = millis();
 	}
 
-	if ((millis() - ButtonTime2 > 2000) && flag2 == 1) // in "ButtonTime > xxxx", where "xxxx" - time of some action
+	if ((millis() - ButtonTime2 > 100) && flag2 == 1) // in "ButtonTime > xxxx", where "xxxx" - time of some action
 	{
 		flag2 = 0;
 		digitalWrite(mosfet2_answerLED2, HIGH); //show the answer
@@ -397,7 +408,7 @@ void but2_rel() // 2Mirror
 	}
 }
 
-void but3_rel() // 3Ticket
+void but3_rel() // 3Tea
 {
 	if (digitalRead(but3) == LOW && flag1 == 0 && flag2 == 0 && flag3 == 0 && flag4 == 0 && flag5 == 0 && flag6 == 0 && flag7 == 0 && flag8 == 0)
 	{
@@ -407,16 +418,18 @@ void but3_rel() // 3Ticket
 
 		mp3_set_serial(Serial2);
 		delay(10);
-		mp3_set_volume (20);
-		mp3_play(3);
+		mp3_set_volume (30);
+		mp3_play(6);
 
-		ticket();
+		digitalWrite(mosfet2_tea, HIGH);
+		delay(500);
+		digitalWrite(mosfet2_tea, LOW);
 
 		push_counter_plus1();
 		ButtonTime3 = millis();
 	}
 
-	if ((millis() - ButtonTime3 > 2000) && flag3 == 1) // in "ButtonTime > xxxx", where "xxxx" - time of some action
+	if ((millis() - ButtonTime3 > 200) && flag3 == 1) // in "ButtonTime > xxxx", where "xxxx" - time of some action
 	{
 		flag3 = 0;
 		digitalWrite(mosfet3_answerLED3, HIGH); //show the answer
@@ -429,7 +442,7 @@ void but3_rel() // 3Ticket
 	}
 }
 
-void but4_rel() // 4Beep
+void but4_rel() // 4Book
 {
 	if (digitalRead(but4) == LOW && flag1 == 0 && flag2 == 0 && flag3 == 0 && flag4 == 0 && flag5 == 0 && flag6 == 0 && flag7 == 0 && flag8 == 0)
 	{
@@ -440,13 +453,14 @@ void but4_rel() // 4Beep
 		mp3_set_serial(Serial2);
 		delay(10);
 		mp3_set_volume (30);
-		mp3_play(4);
+		mp3_play(7);
+		book_open_close();
 
 		push_counter_plus1();
 		ButtonTime4 = millis();
 	}
 
-	if ((millis() - ButtonTime4 > 2000) && flag4 == 1) // in "ButtonTime > xxxx", where "xxxx" - time of some action
+	if ((millis() - ButtonTime4 > 200) && flag4 == 1) // in "ButtonTime > xxxx", where "xxxx" - time of some action
 	{
 		flag4 = 0;
 		digitalWrite(mosfet4_answerLED4, HIGH); //show the answer
@@ -454,12 +468,12 @@ void but4_rel() // 4Beep
 		RamkaTime4 = millis();
 		delay(delay_time);
 		digitalWrite(mosfet4_answerLED4, LOW); //hide the answer
-		Serial.println("Light4 is off");
+		Serial.println("Light is off");
 
 	}
 }
 
-void but5_rel() // 5Curtains
+void but5_rel() // 5Ticket
 {
 	if (digitalRead(but5) == LOW && flag1 == 0 && flag2 == 0 && flag3 == 0 && flag4 == 0 && flag5 == 0 && flag6 == 0 && flag7 == 0 && flag8 == 0)
 	{
@@ -470,30 +484,15 @@ void but5_rel() // 5Curtains
 		mp3_set_serial(Serial2);
 		delay(10);
 		mp3_set_volume (30);
-		mp3_play(5); //curtains on
-		delay(200);
-		curtains_open();
+		mp3_play(3);
 
-		mp3_set_serial(Serial2);
-		delay(10);
-		mp3_set_volume (15);
-		mp3_play(9); //kolesa
-		delay(200);
-		led_strip();
-
-		delay(200);
-		mp3_set_serial(Serial2);
-		delay(10);
-		mp3_set_volume (25);
-		mp3_play(10); //curtains off
-		delay(100);
-		curtains_close();
+		ticket();
 
 		push_counter_plus1();
 		ButtonTime5 = millis();
 	}
 
-	if ((millis() - ButtonTime5 > 2000) && flag5 == 1) // in "ButtonTime > xxxx", where "xxxx" - time of some action
+	if ((millis() - ButtonTime5 > 200) && flag5 == 1) // in "ButtonTime > xxxx", where "xxxx" - time of some action
 	{
 		flag5 = 0;
 		digitalWrite(mosfet5_answerLED5, HIGH); //show the answer
@@ -507,7 +506,7 @@ void but5_rel() // 5Curtains
 	}
 }
 
-void but6_rel() // 6Tea
+void but6_rel() // 6Light
 {
 	if (digitalRead(but6) == LOW && flag1 == 0 && flag2 == 0 && flag3 == 0 && flag4 == 0 && flag5 == 0 && flag6 == 0 && flag7 == 0 && flag8 == 0)
 	{
@@ -517,18 +516,17 @@ void but6_rel() // 6Tea
 
 		mp3_set_serial(Serial2);
 		delay(10);
-		mp3_set_volume (30);
-		mp3_play(6);
-
-		digitalWrite(mosfet2_tea, HIGH);
-		delay(500);
-		digitalWrite(mosfet2_tea, LOW);
+		mp3_set_volume (25);
+		mp3_play(8);
+		delay(100);
+		light_sides_on();
+		delay(5000);
 
 		push_counter_plus1();
 		ButtonTime6 = millis();
 	}
 
-	if ((millis() - ButtonTime6 > 2000) && flag6 == 1) // in "ButtonTime > xxxx", where "xxxx" - wait time
+	if ((millis() - ButtonTime6 > 200) && flag6 == 1) // in "ButtonTime > xxxx", where "xxxx" - wait time
 	{
 		flag6 = 0;
 		digitalWrite(mosfet6_answerLED6, HIGH); //show the answer
@@ -541,7 +539,7 @@ void but6_rel() // 6Tea
 	}
 }
 
-void but7_rel() // 7Book
+void but7_rel() // 7Curtains
 {
 	if (digitalRead(but7) == LOW && flag1 == 0 && flag2 == 0 && flag3 == 0 && flag4 == 0 && flag5 == 0 && flag6 == 0 && flag7 == 0 && flag8 == 0)
 	{
@@ -549,19 +547,34 @@ void but7_rel() // 7Book
 		flag7 = 1;
 		Serial.println("Button7_pushed, do something for a few seconds");
 
-		book_open();
+		mp3_set_serial(Serial2);
+		delay(10);
+		mp3_set_volume (30);
+		mp3_play(5); //curtains on
+		delay(200);
+		curtains_open();
+
 		mp3_set_serial(Serial2);
 		delay(10);
 		mp3_set_volume (20);
-		mp3_play(7);
-		delay(2000);
-		book_close();
+		mp3_play(9); //kolesa
+		delay(200);
+		led_strip();
+
+		delay(200);
+		mp3_set_serial(Serial2);
+		delay(10);
+		mp3_set_volume (30);
+		mp3_play(10); //curtains off
+		delay(100);
+		curtains_close();
+
 
 		push_counter_plus1();
 		ButtonTime7 = millis();
 	}
 
-	if ((millis() - ButtonTime7 > 2000) && flag7 == 1) // in "ButtonTime > xxxx", where "xxxx" - time of some action
+	if ((millis() - ButtonTime7 > 200) && flag7 == 1) // in "ButtonTime > xxxx", where "xxxx" - time of some action
 	{
 		flag7 = 0;
 		digitalWrite(mosfet7_answerLED7, HIGH); //show the answer
@@ -574,7 +587,7 @@ void but7_rel() // 7Book
 	}
 }
 
-void but8_rel() // 8Light
+void but8_rel() // 8Beep
 {
 	if (digitalRead(but8) == LOW && flag1 == 0 && flag2 == 0 && flag3 == 0 && flag4 == 0 && flag5 == 0 && flag6 == 0 && flag7 == 0 && flag8 == 0)
 	{
@@ -584,18 +597,19 @@ void but8_rel() // 8Light
 
 		mp3_set_serial(Serial2);
 		delay(10);
-		mp3_set_volume (20);
-		mp3_play(8);
-		delay(100);
-		light_on();
-		delay(5000);
-		light_off();
+		mp3_set_volume (25);
+		mp3_play(4);
+		delay(1500);
+		light_up_blink();
+		delay(2200);
+		light_up_blink();
+
 
 		push_counter_plus1();
 		ButtonTime8 = millis();
 	}
 
-	if ((millis() - ButtonTime8 > 2000) && flag8 == 1) // in "ButtonTime > xxxx", where "xxxx" - time of some action
+	if ((millis() - ButtonTime8 > 200) && flag8 == 1) // in "ButtonTime > xxxx", where "xxxx" - time of some action
 	{
 		flag8 = 0;
 		digitalWrite(mosfet8_answerLED8, HIGH); //show the answer
